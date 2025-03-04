@@ -1,0 +1,41 @@
+/* Rich text editor content styles */
+.ProseMirror {
+    /* Ensure text wrapping */
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  .ProseMirror p {
+    margin-bottom: 0.75em;
+  }
+  
+  /* Ensure images don't overflow */
+  .ProseMirror img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Ensure code blocks don't overflow */
+  .ProseMirror pre {
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  
+  /* Ensure tables don't overflow */
+  .ProseMirror table {
+    table-layout: fixed;
+    width: 100%;
+    overflow-wrap: break-word;
+  }
+  
+  /* Ensure long words break */
+  .ProseMirror * {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  
