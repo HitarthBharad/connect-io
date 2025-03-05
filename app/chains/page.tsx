@@ -41,6 +41,7 @@ export default function ChainsPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const [loadingChat, setLoadingChat] = useState<boolean>(false);
     const [sendingMessage, setSendingMessage] = useState<boolean>(false);
+    const [ackMessageId, setAckMessageId] = useState(null);
 
     //   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     //     const file = event.target.files?.[0]
@@ -121,6 +122,7 @@ export default function ChainsPage() {
                 {
                     _id: `welcome-${Date.now()}`,
                     chainId,
+                    embedding: "",
                     content: `Hello! I'm your thought chain assistant for "${chain.name}". How can I help you explore these connected thoughts?`,
                     role: "assistant",
                     createdAt: new Date(),
@@ -137,6 +139,70 @@ export default function ChainsPage() {
         }, 100)
     }
 
+    const sendAsyncMessage = async () => {
+        setSendingMessage(true);
+        if (!newMessage.trim() || !activeChatChain) return;
+
+        const userMessage: Omit<Message, "_id"> = {
+            chainId: activeChatChain,
+            content: newMessage,
+            embedding: "",
+            role: "user",
+            createdAt: new Date(),
+        }
+
+        setNewMessage("");
+
+        const response = await fetch("/api/chat/llm", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chainId: activeChatChain, query: newMessage }),
+        });
+
+        if (!response.ok) {
+            toast({
+                title: "Error",
+                description: "Unable to load the previous chat at this moment"
+            })
+            return;
+        }
+
+        const jsonResponse = await response.json();
+
+        setMessages((prev) => [...prev, { ...userMessage, _id: jsonResponse?.messageId }]);
+        setAckMessageId(jsonResponse?.messageId);
+
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+        }, 100)
+    };
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+
+            if(ackMessageId) {
+                const response = await fetch(`/api/chat/get-with-id?messageId=${ackMessageId}`);
+                if (!response.ok) {
+                    toast({
+                        title: "Error",
+                        description: "Unable to retrieve the resposne at this moment"
+                    })
+                    return;
+                }
+    
+                const data = await response.json();
+                if (data.count > 0) {
+                    setMessages((prev) => [...prev, { ...data.message }]);
+                    setSendingMessage(false);
+                    setAckMessageId(null)
+                    clearInterval(interval);
+                }
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [ackMessageId]);
+
     const sendMessage = async () => {
         setNewMessage("");
         setSendingMessage(true);
@@ -145,6 +211,7 @@ export default function ChainsPage() {
         const userMessage: Omit<Message, "_id"> = {
             chainId: activeChatChain,
             content: newMessage,
+            embedding: "",
             role: "user",
             createdAt: new Date(),
         }
@@ -154,7 +221,7 @@ export default function ChainsPage() {
         const response = await fetch("/api/message/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({...userMessage}),
+            body: JSON.stringify({ ...userMessage }),
         });
 
         if (!response.ok) {
@@ -174,6 +241,7 @@ export default function ChainsPage() {
                     {
                         _id: newMessages[0]._id,
                         chainId: newMessages[0].chainId,
+                        embedding: "",
                         content: newMessages[0].content,
                         role: "user",
                         createdAt: newMessages[0].createdAt,
@@ -184,6 +252,7 @@ export default function ChainsPage() {
                         _id: newMessages[0]._id,
                         chainId: newMessages[0].chainId,
                         content: newMessages[0].content,
+                        embedding: "",
                         role: "user",
                         createdAt: newMessages[0].createdAt,
                     },
@@ -202,7 +271,7 @@ export default function ChainsPage() {
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
-            sendMessage()
+            sendAsyncMessage()
         }
     }
 
@@ -456,7 +525,7 @@ export default function ChainsPage() {
                                     onKeyDown={handleKeyDown}
                                     className="flex-1"
                                 />
-                                <Button size="icon" onClick={sendMessage} disabled={sendingMessage && loadingChat && !newMessage.trim()}>
+                                <Button size="icon" onClick={sendAsyncMessage} disabled={sendingMessage && loadingChat && !newMessage.trim()}>
                                     <Send className="h-4 w-4" />
                                     <span className="sr-only">Send</span>
                                 </Button>
