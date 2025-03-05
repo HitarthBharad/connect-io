@@ -1,9 +1,9 @@
-import "./global.css";
+import './globals.css'
 import { Inter } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
 import ClientWrapper from "@/components/client-wrapper";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Connect IO",

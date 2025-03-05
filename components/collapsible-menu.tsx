@@ -25,20 +25,21 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
   const { addThought, updateThought, deleteThought } = useThoughts()
   const [isAddingThought, setIsAddingThought] = useState(false)
   const [isEditingThought, setIsEditingThought] = useState(false)
-  const [newThoughtData, setNewThoughtData] = useState({ text: "", topics: [] as string[] })
+  const [newThoughtData, setNewThoughtData] = useState({ name: "", text: "", topics: [] as string[] })
   const [topicSelectOpen, setTopicSelectOpen] = useState(false)
 
   // Add a new thought
   const addNewThought = useCallback(() => {
     if (newThoughtData.topics.length > 0) {
       const thoughtData = {
+        name: newThoughtData.name,
         text: newThoughtData.text,
         topics: newThoughtData.topics,
         position: { x: Math.random() * 400 + 50, y: Math.random() * 400 + 50 },
       }
 
       addThought(thoughtData)
-      setNewThoughtData({ text: "", topics: [] })
+      setNewThoughtData({ name: "", text: "", topics: [] })
       setIsAddingThought(false)
     }
   }, [newThoughtData, addThought])
@@ -86,6 +87,7 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
               onClick={() => {
                 if (selectedNode) {
                   setNewThoughtData({
+                    name: selectedNode.data.name,
                     text: selectedNode.data.text,
                     topics: selectedNode.data.topics,
                   })
@@ -144,15 +146,15 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
                       <CommandEmpty>No topics found.</CommandEmpty>
                       <CommandGroup>
                         {topics
-                          .filter((topic) => selectedTopics.includes(topic.id))
+                          .filter((topic) => selectedTopics.includes(topic._id))
                           .map((topic) => (
                             <CommandItem
-                              key={topic.id}
+                              key={topic._id}
                               onSelect={() => {
                                 setNewThoughtData((prev) => {
-                                  const topics = prev.topics.includes(topic.id)
-                                    ? prev.topics.filter((t) => t !== topic.id)
-                                    : [...prev.topics, topic.id]
+                                  const topics = prev.topics.includes(topic._id)
+                                    ? prev.topics.filter((t) => t !== topic._id)
+                                    : [...prev.topics, topic._id]
                                   return { ...prev, topics }
                                 })
                               }}
@@ -160,7 +162,7 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  newThoughtData.topics.includes(topic.id) ? "opacity-100" : "opacity-0",
+                                  newThoughtData.topics.includes(topic._id) ? "opacity-100" : "opacity-0",
                                 )}
                               />
                               {topic.label}
@@ -218,15 +220,15 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
                       <CommandEmpty>No topics found.</CommandEmpty>
                       <CommandGroup>
                         {topics
-                          .filter((topic) => selectedTopics.includes(topic.id))
+                          .filter((topic) => selectedTopics.includes(topic._id))
                           .map((topic) => (
                             <CommandItem
-                              key={topic.id}
+                              key={topic._id}
                               onSelect={() => {
                                 setNewThoughtData((prev) => {
-                                  const topics = prev.topics.includes(topic.id)
-                                    ? prev.topics.filter((t) => t !== topic.id)
-                                    : [...prev.topics, topic.id]
+                                  const topics = prev.topics.includes(topic._id)
+                                    ? prev.topics.filter((t) => t !== topic._id)
+                                    : [...prev.topics, topic._id]
                                   return { ...prev, topics }
                                 })
                               }}
@@ -234,7 +236,7 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  newThoughtData.topics.includes(topic.id) ? "opacity-100" : "opacity-0",
+                                  newThoughtData.topics.includes(topic._id) ? "opacity-100" : "opacity-0",
                                 )}
                               />
                               {topic.label}

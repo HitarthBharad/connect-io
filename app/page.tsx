@@ -1,5 +1,3 @@
-import ThoughtBoard from "@/components/thought-board"
-
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">

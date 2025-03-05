@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
     await auth.protect();
-    
+
     try {
         const body = await request.json();
         const { chainId } = body;
@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(messages, { status: 200 });
     }
     catch (error) {
+        console.error(error);
+
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }

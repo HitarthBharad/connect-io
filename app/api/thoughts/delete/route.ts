@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
     await auth.protect();
-    
+
     try {
         const body = await request.json();
         const { _id } = body;
@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
 
     }
     catch (err) {
+        console.error(err);
+
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }
