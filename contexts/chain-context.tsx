@@ -19,7 +19,6 @@ const ChainContext = createContext<ChainContextType | undefined>(undefined)
 export function ChainProvider({ children }: { children: React.ReactNode }) {
 
     const router = useRouter();
-
     const [chains, setChains] = useState<Chain[]>(() => {
         if (typeof window !== "undefined") {
             const saved = localStorage.getItem("chains")

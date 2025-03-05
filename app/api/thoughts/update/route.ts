@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { _id, name, text, topics } = body;
 
+        const { userId } = await auth();
+
         if (!_id) {
             return NextResponse.json(
                 { error: "ID is required" },
@@ -27,6 +29,7 @@ export async function POST(request: NextRequest) {
         const thought = {
             name,
             text,
+            userId,
             topics: topics?.map((topic: string) => new _oid(topic)),
             updatedAt: new Date()
         };

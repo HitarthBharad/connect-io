@@ -154,7 +154,7 @@ export default function ChainsPage() {
         const response = await fetch("/api/message/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userMessage),
+            body: JSON.stringify({...userMessage}),
         });
 
         if (!response.ok) {
@@ -221,7 +221,7 @@ export default function ChainsPage() {
                     <h1 className="text-2xl font-bold">My Chain of thoughts</h1>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={() => router.push("/chains/create")}>
+                    <Button onClick={() => router.push("/chains/add")}>
                         <Plus className="mr-2 h-4 w-4" />
                         New Chain
                     </Button>
@@ -284,7 +284,7 @@ export default function ChainsPage() {
                     ) : (
                         <div className="flex h-[300px] flex-col items-center justify-center rounded-md border border-dashed">
                             <p className="mb-4 text-muted-foreground">No chains found</p>
-                            <Button onClick={() => router.push("/chains/create")}>Create your first chain</Button>
+                            <Button onClick={() => router.push("/chains/add")}>Create your first chain</Button>
                         </div>
                     )}
                 </TabsContent>

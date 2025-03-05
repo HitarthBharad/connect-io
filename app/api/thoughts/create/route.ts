@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        const { userId } = await auth();
+
         const newThought = {
+            userId,
             name,
             text,
             topics: topics?.map((topic: string) => new _oid(topic)),

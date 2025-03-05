@@ -17,6 +17,7 @@ type ThoughtContextType = {
 const ThoughtContext = createContext<ThoughtContextType | undefined>(undefined)
 
 export function ThoughtProvider({ children }: { children: React.ReactNode }) {
+
   const [thoughts, setThoughts] = useState<Thought[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("thoughts")
@@ -63,7 +64,7 @@ export function ThoughtProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch(`/api/thoughts/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({...thought, _id}),
+        body: JSON.stringify({...thought, _id,}),
       });
 
       if (!response.ok) toast.error("Something went wrong while updating your topic");

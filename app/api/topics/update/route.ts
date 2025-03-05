@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
     await auth.protect();
-    
+
     try {
         const body = await request.json();
         const { label, color, _id } = body;
@@ -23,9 +23,12 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             )
         }
+        
+        const { userId } = await auth();
 
         const topic = {
             label,
+            userId,
             color,
             updatedAt: new Date()
         };

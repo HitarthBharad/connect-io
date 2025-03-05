@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { name, nodes, edges } = body;
 
+        const { userId } = await auth();
+
         if (!nodes || !edges || !name) {
             return NextResponse.json(
                 { error: "Name is required" },
@@ -18,6 +20,7 @@ export async function POST(request: NextRequest) {
         }
 
         const newChain = {
+            userId,
             nodes,
             edges,
             name,

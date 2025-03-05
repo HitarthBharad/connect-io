@@ -57,7 +57,7 @@ export function TopicProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch(`/api/topics/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(topic),
+        body: JSON.stringify({ ...topic}),
       });
 
       if (!response.ok) toast.error("Something went wrong while updating your topic");
@@ -76,7 +76,7 @@ export function TopicProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch(`/api/topics/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(topic),
+        body: JSON.stringify({...topic}),
       });
 
       if (!response.ok) throw new Error("Failed to delete topic");

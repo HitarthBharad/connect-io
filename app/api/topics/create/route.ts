@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const { userId } = await auth();
+
     const newTopic = {
+      userId,
       label,
       color,
       createdAt: new Date()
