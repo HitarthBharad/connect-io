@@ -6,7 +6,7 @@ import OpenAI from "openai";
 import { env } from "@/lib/env";
 import { auth } from '@clerk/nextjs/server'
 
-const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY, baseURL: 'https://api.kluster.ai/v1' });
 
 function generatePrompt(graph: Chain, userQuestion: string) {
   let prompt = "You are a smart personal assitant who will provide personally curated answer given below context of interconnected thoughts:\n\n";
@@ -28,7 +28,7 @@ function generatePrompt(graph: Chain, userQuestion: string) {
 
 const queryLLM = async (prompt: string) => {
   const response = await openai.chat.completions.create({
-    model: "gpt-4-turbo",
+    model: "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo",
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -39,7 +39,7 @@ const queryLLM = async (prompt: string) => {
 export async function POST(request: NextRequest) {
 
   await auth.protect();
-  
+
   try {
     const body = await request.json();
     const { chainId, content, role } = body;
