@@ -45,16 +45,16 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
   }, [newThoughtData, addThought])
 
   // Edit an existing thought
-  const editThought = useCallback(() => {
-    if (selectedNode) {
-      updateThought(selectedNode.id, {
-        text: newThoughtData.text,
-        topics: newThoughtData.topics,
-      })
-      setIsEditingThought(false)
-      setSelectedNode(null)
-    }
-  }, [selectedNode, newThoughtData, updateThought, setSelectedNode])
+  // const editThought = useCallback(() => {
+  //   if (selectedNode) {
+  //     updateThought(selectedNode.id, {
+  //       text: newThoughtData.text,
+  //       topics: newThoughtData.topics,
+  //     })
+  //     setIsEditingThought(false)
+  //     setSelectedNode(null)
+  //   }
+  // }, [selectedNode, newThoughtData, updateThought, setSelectedNode])
 
   // Delete selected thought
   const deleteSelected = useCallback(() => {
@@ -187,7 +187,7 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
       </Dialog>
 
       {/* Edit Thought Dialog */}
-      <Dialog open={isEditingThought} onOpenChange={setIsEditingThought}>
+      {/* <Dialog open={isEditingThought} onOpenChange={setIsEditingThought}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Thought</DialogTitle>
@@ -258,7 +258,7 @@ export function CollapsibleMenu({ selectedNode, setSelectedNode, selectedTopics 
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   )
 }

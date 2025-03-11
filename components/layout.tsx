@@ -10,10 +10,8 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
     const { signOut } = useClerk();
     return (
         <div className="flex flex-col h-screen">
-            {/* Top Bar */}
             <header className="flex items-center justify-between px-6 py-3 bg-background border-b shadow-sm">
 
-                {/* Branding */}
                 <div className="text-xl font-bold">
                     <Link href="/">Connect IO</Link>
                 </div>
@@ -21,9 +19,10 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
                 {/* Navigation Links */}
                 <nav className="hidden md:flex space-x-6">
                     <Link href="/" className="text-foreground hover:text-primary transition">Home</Link>
-                    <Link href="/topics" className="text-foreground hover:text-primary transition">Topics</Link>
+                    {/* <Link href="/topics" className="text-foreground hover:text-primary transition">Topics</Link> */}
                     <Link href="/thoughts" className="text-foreground hover:text-primary transition">Thoughts</Link>
                     <Link href="/chains" className="text-foreground hover:text-primary transition">Chain</Link>
+                    <Link href="/" className="text-foreground hover:text-primary transition">Chat</Link>
                 </nav>
 
                 <div>

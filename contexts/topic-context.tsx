@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 type TopicContextType = {
   topics: Topic[];
-  addTopic: (topic: Omit<Topic, "_id" | "thoughtCount">) => Promise<void>;
+  addTopic: (topic: Omit<Topic, "_id" | "thoughtCount">) => Promise<Topic | null>;
   updateTopic: (_id: string, topic: Partial<Topic>) => Promise<void>;
   deleteTopic: (_id: string) => Promise<void>;
 };
@@ -44,8 +44,10 @@ export function TopicProvider({ children }: { children: React.ReactNode }) {
 
       const newTopic: Topic = await response.json();
       setTopics((prev) => [...prev, newTopic]);
+      return newTopic;
     } catch (error) {
       console.error("Error adding topic:", error);
+      return null;
     }
   };
 

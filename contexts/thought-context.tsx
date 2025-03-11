@@ -8,10 +8,13 @@ import { toast } from "sonner"
 
 type ThoughtContextType = {
   thoughts: Thought[]
-  addThought: (thought: Omit<Thought, "_id" | "dateModified">) => void
-  updateThought: (_id: string, thought: Partial<Thought>) => void
+  addThought: (thought: Omit<Thought, "_id" | "dateModified">) => Promise<Thought | null>
+  updateThought: (_id: string, thought: Omit<Thought, "_id">) => Promise<Thought | null>
   deleteThought: (_id: string) => void
   filteredThoughts: (topicIds: string[]) => Thought[]
+  putThought: (thought: Thought) => void
+  getThought: () => Thought | null
+  removeThought: () => void
 }
 
 const ThoughtContext = createContext<ThoughtContextType | undefined>(undefined)
@@ -24,6 +27,14 @@ export function ThoughtProvider({ children }: { children: React.ReactNode }) {
       return saved ? JSON.parse(saved) : []
     }
     return []
+  });
+
+  const [tempThought, setTempThought] = useState<Thought | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("temp_thought")
+      return saved ? JSON.parse(saved) : null
+    }
+    return null;
   });
 
   useEffect(() => {
@@ -53,12 +64,15 @@ export function ThoughtProvider({ children }: { children: React.ReactNode }) {
 
       const newThought: Thought = await response.json();
       setThoughts((prev) => [...prev, newThought]);
+
+      return newThought;
     } catch (error) {
       console.error("Error adding thought:", error);
+      return null;
     }
   }
 
-  const updateThought = async (_id: string, thought: Partial<Thought>) => {
+  const updateThought = async (_id: string, thought: Omit<Thought,  "_id" >) => {
     try {
 
       const response = await fetch(`/api/thoughts/update`, {
@@ -70,9 +84,24 @@ export function ThoughtProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) toast.error("Something went wrong while updating your topic");
 
       setThoughts((prev) => prev.map((t) => (t._id === _id ? { ...t, ...{...thought, _id} } : t)));
+
+      return {...thought, _id};
     } catch (error) {
       console.error("Error updating topic:", error);
+      return null;
     }
+  }
+
+  const putThought = (thought: Thought) => {
+    setTempThought(thought);
+  };
+
+  const getThought = () => {
+    return tempThought;
+  };
+
+  const removeThought = () => {
+    setTempThought(null);
   }
 
   const deleteThought = async (_id: string) => {
@@ -106,6 +135,9 @@ export function ThoughtProvider({ children }: { children: React.ReactNode }) {
         updateThought,
         deleteThought,
         filteredThoughts,
+        putThought,
+        getThought,
+        removeThought
       }}
     >
       {children}

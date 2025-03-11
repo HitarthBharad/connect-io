@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Check, ChevronsUpDown, Plus, Pencil, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RichTextEditor } from "@/components/rich-text-editor"
+import { useRouter } from "next/navigation"
 
 const getContentPreview = (htmlContent: string) => {
     const tempDiv = document.createElement("div")
@@ -32,7 +33,8 @@ const getContentPreview = (htmlContent: string) => {
 
 export default function ThoughtsPage() {
     const { topics } = useTopics()
-    const { thoughts, addThought, updateThought, deleteThought, filteredThoughts } = useThoughts()
+    const router = useRouter();
+    const { thoughts, addThought, updateThought, deleteThought, filteredThoughts, putThought } = useThoughts()
     const [isAddOpen, setIsAddOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [editingThought, setEditingThought] = useState<string | null>(null)
@@ -70,13 +72,15 @@ export default function ThoughtsPage() {
         text: string,
         topics: string[]
     }) => {
-        setEditingThought(thought._id)
-        setFormData({
-            name: thought.name,
-            text: thought.text,
-            topics: thought.topics
-        })
-        setIsEditOpen(true)
+        //setEditingThought(thought._id)
+        // setFormData({
+        //     name: thought.name,
+        //     text: thought.text,
+        //     topics: thought.topics
+        // })
+        putThought(thought);
+        router.push("/thoughts/edit")
+        //setIsEditOpen(true)
     }
 
     const gradientClasses = (thoughtTopics: string[]) => {
@@ -150,7 +154,11 @@ export default function ThoughtsPage() {
                     <h1 className="text-2xl font-bold">Thoughts</h1>
                     <p className="text-muted-foreground">Capture and organize your thoughts.</p>
                 </div>
-                <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <Button onClick={() => router.push("/thoughts/add")}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Thought
+                </Button>
+                {/* <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                     <DialogTrigger asChild>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
@@ -235,7 +243,7 @@ export default function ThoughtsPage() {
                             <Button onClick={handleSubmit}>Create Thought</Button>
                         </DialogFooter>
                     </DialogContent>
-                </Dialog>
+                </Dialog> */}
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
