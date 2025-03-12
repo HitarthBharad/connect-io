@@ -21,6 +21,7 @@ import { Check, ChevronsUpDown, Plus, Pencil, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
 
 const getContentPreview = (htmlContent: string) => {
     const tempDiv = document.createElement("div")
@@ -51,7 +52,6 @@ export default function ThoughtsPage() {
 
     const handleSubmit = () => {
         if (editingThought) {
-            console.log(editingThought);
             updateThought(editingThought, formData)
             setIsEditOpen(false)
         } else {
@@ -72,15 +72,8 @@ export default function ThoughtsPage() {
         text: string,
         topics: string[]
     }) => {
-        //setEditingThought(thought._id)
-        // setFormData({
-        //     name: thought.name,
-        //     text: thought.text,
-        //     topics: thought.topics
-        // })
         putThought(thought);
         router.push("/thoughts/edit")
-        //setIsEditOpen(true)
     }
 
     const gradientClasses = (thoughtTopics: string[]) => {
@@ -94,17 +87,6 @@ export default function ThoughtsPage() {
         if (colors.length == 0) {
             return "relative overflow-hidden bg-gradient-to-br from-white via-white to-gray-50 before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-gray-400 before:to-gray-200";
         }
-
-        const colorMap: Record<string, string> = {
-            "blue": "to-blue-100 before:from-blue-400 after:to-blue-200",
-            "green": "to-green-100 before:from-green-400 after:to-green-200",
-            "purple": "to-purple-100 before:from-purple-400 after:to-purple-200",
-            "amber": "to-amber-100 before:from-amber-400 after:to-amber-200",
-            "rose": "to-rose-100 before:from-rose-400 after:to-rose-200",
-            "cyan": "to-cyan-100 before:from-cyan-400 after:to-cyan-200",
-            "emerald": "to-emerald-100 before:from-emerald-400 after:to-emerald-200",
-            "indigo": "to-indigo-100 before:from-indigo-400 after:to-indigo-200",
-        };
 
         const extractColor = (color: string | undefined) => {
             const match = color?.match(/bg-(\w+)-100/);
@@ -122,36 +104,19 @@ export default function ThoughtsPage() {
         );
     };
 
-    /*
-        const colorMap: Record<string, string> = {
-            "blue": "to-blue-100 before:from-blue-400 after:to-blue-200",
-            "green": "to-green-100 before:from-green-400 after:to-green-200",
-            "purple": "to-purple-100 before:from-purple-400 after:to-purple-200",
-            "amber": "to-amber-100 before:from-amber-400 after:to-amber-200",
-            "rose": "to-rose-100 before:from-rose-400 after:to-rose-200",
-            "cyan": "to-cyan-100 before:from-cyan-400 after:to-cyan-200",
-            "emerald": "to-emerald-100 before:from-emerald-400 after:to-emerald-200",
-            "indigo": "to-indigo-100 before:from-indigo-400 after:to-indigo-200",
-        };
-
-        const extractColor = (color: string) => {
-            const match = color.match(/bg-(\w+)-100/);
-            return match ? match[1] : "gray";
-        };
-
-        const primaryColor = extractColor(baseColor);
-
-        return cn([
-            "relative overflow-hidden bg-gradient-to-br from-white via-white",
-            colorMap[primaryColor] || "to-gray-100 before:from-gray-400 after:to-gray-200",
-        ]);
-    */
-
     return (
         <div>
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold">Thoughts</h1>
+                    <h1 className="text-2xl font-bold flex items-center">
+                        Thoughts
+                        <Badge
+                            variant="secondary"
+                            className="ml-2 bg-blue-300 text-white rounded-full px-2 py-1 text-sm font-semibold shadow-lg"
+                        >
+                            {thoughts.length}
+                        </Badge>
+                    </h1>
                     <p className="text-muted-foreground">Capture and organize your thoughts.</p>
                 </div>
                 <Button onClick={() => router.push("/thoughts/add")}>
@@ -284,7 +249,7 @@ export default function ThoughtsPage() {
                             <p className="text-sm text-muted-foreground line-clamp-2 mb-2 mt-2">{getContentPreview(thought.text)}</p>
                             <CardDescription className="mt-2 text-sm font-mono text-gray-500 italic">
                                 Modified: {new Date().toDateString()}
-                            </CardDescription>              
+                            </CardDescription>
                         </CardContent>
                     </Card>
                 ))}

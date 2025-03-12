@@ -13,15 +13,19 @@ import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";
-import Heading from "@tiptap/extension-heading";
-import Placeholder from "@tiptap/extension-placeholder"; 
+import Heading, { Level } from "@tiptap/extension-heading";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Bold, Italic, Strikethrough, Quote, Undo, Redo, Heading1, Heading2, Heading3, List, ListOrdered, Table as TableIcon, Image as ImageIcon, Columns, Plus, Minus } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 interface RichTextEditorProps {
   content: string;
   setContent: (content: string) => void;
 }
+
+type ActionType = "toggleBold" | "toggleItalic" | "toggleStrike" | "toggleBlockquote";
 
 const RichTextEditor = ({ content, setContent }: RichTextEditorProps) => {
   const editor = useEditor({
@@ -49,108 +53,101 @@ const RichTextEditor = ({ content, setContent }: RichTextEditorProps) => {
     }
   });
 
-  if (!editor) return null;
+  if (!editor) {
+    return <p>Loading editor...</p>
+  }
+
+
+  const actions: { action: ActionType; icon: React.ComponentType<{ className: string }>; label: string }[] = [
+    { action: "toggleBold", icon: Bold, label: "Bold" },
+    { action: "toggleItalic", icon: Italic, label: "Italic" },
+    { action: "toggleStrike", icon: Strikethrough, label: "Strike" },
+    { action: "toggleBlockquote", icon: Quote, label: "Quote" },
+  ];
 
   return (
     <div className="flex flex-col bg-gray-100">
-      <div className="flex flex-wrap gap-2 bg-white shadow-md p-3 sticky top-0 z-50 border-b">
-        <Button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={cn("px-3", editor.isActive("bold") && "bg-white-800 text-black")}
-        >
-          Bold
+
+      <div className="flex flex-wrap items-center gap-2 bg-white shadow-md p-3 sticky top-0 z-50 border-b">
+        {actions.map(({ action, icon: Icon, label }) => (
+          <Button
+            key={label}
+            onClick={() => editor.chain().focus()[action as ActionType]().run()}
+            variant="outline"
+            className="p-2"
+          >
+            <Icon className="h-5 w-5" />
+          </Button>
+        ))}
+
+        <Button onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} variant="ghost">
+          <Undo className="h-5 w-5" />
         </Button>
-        <Button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={cn("px-3", editor.isActive("italic") && "bg-white-800 text-black")}
-        >
-          Italic
+        <Button onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} variant="ghost">
+          <Redo className="h-5 w-5" />
         </Button>
-        <Button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={cn("px-3", editor.isActive("strike") && "bg-white-800 text-black")}
-        >
-          Strike
+
+        {[1, 2, 3].map((level) => (
+          <Button
+            key={level}
+            onClick={() => editor.chain().focus().toggleHeading({ level: level as Level}).run()}
+            variant="outline"
+            className="p-2"
+          >
+            {level === 1 ? <Heading1 className="h-5 w-5" /> : level === 2 ? <Heading2 className="h-5 w-5" /> : <Heading3 className="h-5 w-5" />}
+          </Button>
+        ))}
+
+        <Button onClick={() => editor.chain().focus().toggleBulletList().run()} variant="outline" className="p-2">
+          <List className="h-5 w-5" />
         </Button>
-        <Button
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={cn("px-3", editor.isActive("blockquote") && "bg-white-800 text-black")}
-        >
-          Quote
+        <Button onClick={() => editor.chain().focus().toggleOrderedList().run()} variant="outline" className="p-2">
+          <ListOrdered className="h-5 w-5" />
         </Button>
-        <Button onClick={() => editor.chain().focus().setHorizontalRule().run()}>HR</Button>
-        <Button onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}>
-          Undo
-        </Button>
-        <Button onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()}>
-          Redo
-        </Button>
-        <Button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>H1</Button>
-        <Button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>H2</Button>
-        <Button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>H3</Button>
-        <Button onClick={() => editor.chain().focus().toggleBulletList().run()}>Bullet List</Button>
-        <Button onClick={() => editor.chain().focus().toggleOrderedList().run()}>Ordered List</Button>
-        <Button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()}>Table</Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-1" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()}>
+              <TableIcon className="h-5 w-5" /> Table
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()}>
+              <TableIcon className="h-4 w-4 mr-2" /> Insert Table
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => editor.chain().focus().addRowBefore().run()}>
+              <Plus className="h-4 w-4 mr-2 text-blue-500" /> Add Row Above
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => editor.chain().focus().addRowAfter().run()}>
+              <Plus className="h-4 w-4 mr-2 text-green-500" /> Add Row Below
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => editor.chain().focus().deleteRow().run()}>
+              <Minus className="h-4 w-4 mr-2 text-red-500" /> Remove Row
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => editor.chain().focus().addColumnBefore().run()}>
+              <Columns className="h-4 w-4 mr-2 text-blue-500" /> Add Column Before
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => editor.chain().focus().addColumnAfter().run()}>
+              <Columns className="h-4 w-4 mr-2 text-green-500" /> Add Column After
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => editor.chain().focus().deleteColumn().run()}>
+              <Minus className="h-4 w-4 mr-2 text-red-500" /> Remove Column
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           onClick={() => {
             const url = prompt("Enter image URL");
             if (url) editor.chain().focus().setImage({ src: url }).run();
           }}
+          variant="outline"
+          className="p-2"
         >
-          Image
+          <ImageIcon className="h-5 w-5" />
         </Button>
 
-        {
-          editor.isActive("table") && (
-            <div className="gap-4 p-4 bg-white shadow-md rounded-lg border border-gray-200 mt-4">
-              <p className="text-lg font-semibold text-gray-800 mb-2">Table Formatting</p>
-
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => editor.chain().focus().addRowBefore().run()}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-                >
-                  Add Row Above
-                </Button>
-
-                <Button
-                  onClick={() => editor.chain().focus().addRowAfter().run()}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none"
-                >
-                  Add Row Below
-                </Button>
-
-                <Button
-                  onClick={() => editor.chain().focus().deleteRow().run()}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
-                >
-                  Remove Row
-                </Button>
-
-                <Button
-                  onClick={() => editor.chain().focus().addColumnBefore().run()}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-                >
-                  Add Column Before
-                </Button>
-
-                <Button
-                  onClick={() => editor.chain().focus().addColumnAfter().run()}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none"
-                >
-                  Add Column After
-                </Button>
-
-                <Button
-                  onClick={() => editor.chain().focus().deleteColumn().run()}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
-                >
-                  Remove Column
-                </Button>
-              </div>
-            </div>
-          )
-        }
       </div>
 
       <div className="flex-1 overflow-auto p-6">
