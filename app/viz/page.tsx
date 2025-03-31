@@ -43,7 +43,8 @@ const VizPage = () => {
         loading ? (
           <Loader />
         ) : (
-          <EmbeddingPlot thoughts={thought} edges={edges} />
+          // <EmbeddingPlot thoughts={thought} edges={edges} />
+          <Loader />
         )
       }
     </div>
