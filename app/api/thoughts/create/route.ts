@@ -2,9 +2,14 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { _oid, mongodb } from "@/lib/db.server";
 import { auth } from '@clerk/nextjs/server'
+import { generateEmbedding } from "@/lib/chat/embeddings";
+import reduceEmbeddingDimension from "@/lib/chat/reduceEmbeddingDimension";
+import processText from "@/lib/chat/processText";
+// import { reduceEmbeddingDimension } from "@/lib/chat/reduceEmbeddingDimension";
 
 export async function POST(request: NextRequest) {
     await auth.protect();
+
     try {
         const body = await request.json();
         const { name, text, topics } = body;
@@ -18,21 +23,28 @@ export async function POST(request: NextRequest) {
 
         const { userId } = await auth();
 
+        if(!userId) {
+            return NextResponse.json({success: false});
+        }
+
         const newThought = {
             userId,
             name,
             text,
             topics: topics?.map((topic: string) => new _oid(topic)),
+            processd: false,
             createdAt: new Date()
         };
 
         const dbInstance = await mongodb();
 
-        await dbInstance
+        const thoughtInstance = await dbInstance
             .collection("thoughts")
             .insertOne(newThought);
 
-        return NextResponse.json(newThought, { status: 201 })
+        processText(text, thoughtInstance.insertedId.toString(), userId);
+
+        return NextResponse.json({...newThought, _id: thoughtInstance.insertedId}, { status: 201 })
 
     } catch (error) {
         console.error(error);

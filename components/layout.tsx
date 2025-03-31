@@ -21,7 +21,7 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
                     <Link href="/" className="text-foreground hover:text-primary transition">Home</Link>
                     {/* <Link href="/topics" className="text-foreground hover:text-primary transition">Topics</Link> */}
                     <Link href="/thoughts" className="text-foreground hover:text-primary transition">Thoughts</Link>
-                    <Link href="/chains" className="text-foreground hover:text-primary transition">Chain</Link>
+                    <Link href="/viz" className="text-foreground hover:text-primary transition">Chain</Link>
                     <Link href="/" className="text-foreground hover:text-primary transition">Chat</Link>
                 </nav>
 

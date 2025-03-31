@@ -3,9 +3,10 @@ import { mongodb } from "@/lib/db.server";
 import { auth } from '@clerk/nextjs/server'
 
 export async function GET(request: NextRequest) {
-    await auth.protect();
+    // await auth.protect();
     try {
-        const { userId } = await auth();
+        // const { userId } = await auth();
+        const userId = "user_2trzJ8YoqWOzCUx9Xlkl28cjW0Y";
 
         const dbInstance = await mongodb();
         const thoughts = await dbInstance
